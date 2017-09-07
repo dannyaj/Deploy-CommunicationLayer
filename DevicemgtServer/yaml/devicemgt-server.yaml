@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: devicemgt-server
+  labels:
+    communication-layer: devicemgt-server
+spec:
+  replicas: 1
+  selector:
+    communication-layer: devicemgt-server
+  template:
+    metadata:
+      labels:
+        communication-layer: devicemgt-server
+    spec:
+      containers:
+      - name: devicemgt-server
+        image: ${IMG}
+        command: ["/usr/bin/java"]
+        args: ["-jar", "/jar/DeviceManagerServer.jar", "-l", "debug",
+           "-i", "rabbitmq",
+           "-q", "iot.devicemgt.queue",
+           "-r", "iot.devicemgt.routing",
+           "-t", "direct",
+           "-x", "iot.devicemgt.exchange",
+           "-db_ip", "10.1.5.130",
+           "-db_port", "31057",
+           "-db_name", "iot"]

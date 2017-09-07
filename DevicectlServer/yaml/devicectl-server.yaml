@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: devicectl-server
+  labels:
+    communication-layer: devicectl-server
+spec:
+  replicas: 1
+  selector:
+    communication-layer: devicectl-server
+  template:
+    metadata:
+      labels:
+        communication-layer: devicectl-server
+    spec:
+      containers:
+      - name: devicectl-server
+        image: ${IMG}
+        command: ["/usr/bin/java"]
+        args: ["-jar", "/jar/DeviceControllerServer.jar", "-l", "debug",
+           "-i", "rabbitmq",
+           "-q", "iot.devicectl.queue",
+           "-r", "iot.devicectl.routing",
+           "-t", "direct",
+           "-x", "iot.devicectl.exchange"]

@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: monitor-server
+  labels:
+    communication-layer: monitor-server
+spec:
+  replicas: 1
+  selector:
+    communication-layer: monitor-server
+  template:
+    metadata:
+      labels:
+        communication-layer: monitor-server
+    spec:
+      containers:
+      - name: monitor-server
+        image: ${IMG}
+        command: ["/usr/bin/java"]
+        args: ["-jar", "/jar/MonitorServer.jar", "-l", "debug",
+           "-i", "rabbitmq",
+           "-q", "iot.monitor.queue",
+           "-r", "iot.monitor.routing",
+           "-t", "direct",
+           "-x", "iot.monitor.exchange",
+           "-db_ip", "10.1.5.130",
+           "-db_port", "31057",
+           "-db_name", "iot"]

@@ -1,0 +1,39 @@
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: monitor-edge
+  labels:
+    communication-layer: monitor-edge
+spec:
+  replicas: 1
+  selector:
+    communication-layer: monitor-edge
+  template:
+    metadata:
+      labels:
+        communication-layer: monitor-edge
+    spec:
+      containers:
+      - name: monitor-edge
+        image: ${IMG}
+        command: ["/usr/bin/java"]
+        args: ["-jar", "/jar/MonitorApi.jar", "-l", "debug",
+           "-i", "rabbitmq",
+           "-r", "iot.monitor.routing",
+           "-t", "direct",
+           "-x", "iot.monitor.exchange"]
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    communication-layer: monitor-edge
+  name: monitor-service
+spec:
+  #type: NodePort
+  ports:
+  - port: 8082
+    name: port-8082
+  selector:
+    communication-layer: monitor-edge

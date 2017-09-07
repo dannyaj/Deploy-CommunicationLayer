@@ -1,0 +1,39 @@
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: devicemgt-edge
+  labels:
+    communication-layer: devicemgt-edge
+spec:
+  replicas: 1
+  selector:
+    communication-layer: devicemgt-edge
+  template:
+    metadata:
+      labels:
+        communication-layer: devicemgt-edge
+    spec:
+      containers:
+      - name: devicemgt-edge
+        image: ${IMG}
+        command: ["/usr/bin/java"]
+        args: ["-jar", "/jar/DeviceManagerApi.jar", "-l", "debug",
+           "-i", "rabbitmq",
+           "-r", "iot.devicemgt.routing",
+           "-t", "direct",
+           "-x", "iot.devicemgt.exchange"]
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    communication-layer: devicemgt-edge
+  name: devicemgt-service
+spec:
+  #type: NodePort
+  ports:
+  - port: 8081
+    name: port-8081
+  selector:
+    communication-layer: devicemgt-edge
